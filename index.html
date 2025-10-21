@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Visualization Explorer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Color Visualization Explorer</h1>
+        <p>Explore color theory principles for effective data visualization</p>
+    </header>
+
+    <main>
+        <!-- Color Palette Types Section -->
+        <section class="section" id="palette-types">
+            <h2>1. Color Palette Types</h2>
+            <p>Different data types require different color approaches</p>
+
+            <div class="palette-container">
+                <div class="palette-card">
+                    <h3>Sequential</h3>
+                    <p>For ordered data (low to high)</p>
+                    <div class="palette sequential" id="sequential-palette"></div>
+                    <button onclick="randomizeSequential()">Randomize</button>
+                </div>
+
+                <div class="palette-card">
+                    <h3>Diverging</h3>
+                    <p>For data with a meaningful midpoint</p>
+                    <div class="palette diverging" id="diverging-palette"></div>
+                    <button onclick="randomizeDiverging()">Randomize</button>
+                </div>
+
+                <div class="palette-card">
+                    <h3>Categorical</h3>
+                    <p>For distinct, unordered categories</p>
+                    <div class="palette categorical" id="categorical-palette"></div>
+                    <button onclick="randomizeCategorical()">Randomize</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Good vs Bad Examples -->
+        <section class="section" id="good-bad">
+            <h2>2. Good vs Bad Color Combinations</h2>
+            <p>See what works and what doesn't</p>
+
+            <div class="comparison-container">
+                <div class="comparison-card bad">
+                    <h3>❌ Bad Examples</h3>
+                    <div class="examples">
+                        <div class="example-item">
+                            <div class="color-combo bad-combo-1"></div>
+                            <p>Low contrast - hard to distinguish</p>
+                        </div>
+                        <div class="example-item">
+                            <div class="color-combo bad-combo-2"></div>
+                            <p>Rainbow colors - implies false ordering</p>
+                        </div>
+                        <div class="example-item">
+                            <div class="color-combo bad-combo-3"></div>
+                            <p>Too many similar hues</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card good">
+                    <h3>✅ Good Examples</h3>
+                    <div class="examples">
+                        <div class="example-item">
+                            <div class="color-combo good-combo-1"></div>
+                            <p>High contrast - easily distinguishable</p>
+                        </div>
+                        <div class="example-item">
+                            <div class="color-combo good-combo-2"></div>
+                            <p>Perceptually uniform gradient</p>
+                        </div>
+                        <div class="example-item">
+                            <div class="color-combo good-combo-3"></div>
+                            <p>Distinct, balanced categorical colors</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Color Tester -->
+        <section class="section" id="color-tester">
+            <h2>3. Interactive Color Tester</h2>
+            <p>Build your own palette and test it</p>
+
+            <div class="tester-container">
+                <div class="color-picker-panel">
+                    <h3>Select Colors</h3>
+                    <div id="color-inputs">
+                        <div class="color-input-group">
+                            <label>Color 1:</label>
+                            <input type="color" id="color1" value="#2E86AB">
+                        </div>
+                        <div class="color-input-group">
+                            <label>Color 2:</label>
+                            <input type="color" id="color2" value="#A23B72">
+                        </div>
+                        <div class="color-input-group">
+                            <label>Color 3:</label>
+                            <input type="color" id="color3" value="#F18F01">
+                        </div>
+                        <div class="color-input-group">
+                            <label>Color 4:</label>
+                            <input type="color" id="color4" value="#C73E1D">
+                        </div>
+                        <div class="color-input-group">
+                            <label>Color 5:</label>
+                            <input type="color" id="color5" value="#6A994E">
+                        </div>
+                    </div>
+                    <button onclick="testColors()" class="test-btn">Test This Palette</button>
+                </div>
+
+                <div class="test-results">
+                    <h3>Visualization Preview</h3>
+                    <div class="preview-chart" id="preview-chart"></div>
+
+                    <h3>Analysis</h3>
+                    <div id="analysis-results"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Color Blindness Simulation -->
+        <section class="section" id="colorblind-sim">
+            <h2>4. Color Blindness Simulation</h2>
+            <p>See how your colors appear to people with different types of color vision deficiency</p>
+
+            <div class="colorblind-container">
+                <div class="simulation-controls">
+                    <label>Vision Type:</label>
+                    <select id="vision-type" onchange="updateColorblindSim()">
+                        <option value="normal">Normal Vision</option>
+                        <option value="protanopia">Protanopia (Red-Blind)</option>
+                        <option value="deuteranopia">Deuteranopia (Green-Blind)</option>
+                        <option value="tritanopia">Tritanopia (Blue-Blind)</option>
+                        <option value="achromatopsia">Achromatopsia (Total Color Blindness)</option>
+                    </select>
+                </div>
+
+                <div class="simulation-preview" id="colorblind-preview"></div>
+
+                <div class="colorblind-info">
+                    <p id="colorblind-description"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contrast Checker -->
+        <section class="section" id="contrast-checker">
+            <h2>5. Contrast Checker</h2>
+            <p>Ensure your colors meet accessibility standards</p>
+
+            <div class="contrast-container">
+                <div class="contrast-inputs">
+                    <div class="contrast-input-group">
+                        <label>Foreground Color:</label>
+                        <input type="color" id="fg-color" value="#000000">
+                    </div>
+                    <div class="contrast-input-group">
+                        <label>Background Color:</label>
+                        <input type="color" id="bg-color" value="#FFFFFF">
+                    </div>
+                    <button onclick="checkContrast()" class="test-btn">Check Contrast</button>
+                </div>
+
+                <div class="contrast-preview">
+                    <div id="contrast-sample">
+                        <span>Sample Text</span>
+                    </div>
+                </div>
+
+                <div class="contrast-results" id="contrast-results"></div>
+            </div>
+        </section>
+
+        <!-- Color Harmony -->
+        <section class="section" id="color-harmony">
+            <h2>6. Color Harmony Rules</h2>
+            <p>Generate harmonious color combinations</p>
+
+            <div class="harmony-container">
+                <div class="harmony-controls">
+                    <label>Base Color:</label>
+                    <input type="color" id="base-color" value="#3498db">
+                    <label>Harmony Type:</label>
+                    <select id="harmony-type" onchange="generateHarmony()">
+                        <option value="complementary">Complementary</option>
+                        <option value="analogous">Analogous</option>
+                        <option value="triadic">Triadic</option>
+                        <option value="split-complementary">Split Complementary</option>
+                        <option value="tetradic">Tetradic (Square)</option>
+                    </select>
+                    <button onclick="generateHarmony()" class="test-btn">Generate</button>
+                </div>
+
+                <div class="harmony-result" id="harmony-result"></div>
+                <div class="harmony-description" id="harmony-description"></div>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section class="section" id="best-practices">
+            <h2>7. Best Practices Summary</h2>
+            <div class="best-practices-grid">
+                <div class="practice-card">
+                    <h3>✓ Do</h3>
+                    <ul>
+                        <li>Use colorblind-friendly palettes</li>
+                        <li>Ensure sufficient contrast (4.5:1 minimum)</li>
+                        <li>Use sequential colors for ordered data</li>
+                        <li>Limit palette to 5-7 distinct colors</li>
+                        <li>Test on different displays</li>
+                        <li>Consider cultural color associations</li>
+                    </ul>
+                </div>
+
+                <div class="practice-card">
+                    <h3>✗ Don't</h3>
+                    <ul>
+                        <li>Don't rely on color alone to convey information</li>
+                        <li>Don't use rainbow colors for unordered data</li>
+                        <li>Don't use red-green for critical distinctions</li>
+                        <li>Don't use too many similar shades</li>
+                        <li>Don't ignore contrast ratios</li>
+                        <li>Don't use neon or oversaturated colors</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Color Visualization Explorer - Learn effective color use in data visualization</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
