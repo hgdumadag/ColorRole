@@ -86,6 +86,13 @@ function getContrastRatio(rgb1, rgb2) {
     return (lighter + 0.05) / (darker + 0.05);
 }
 
+function getReadableTextColor(hex) {
+    const rgb = hexToRgb(hex);
+    if (!rgb) return '#ffffff';
+    const luminance = getLuminance(rgb.r, rgb.g, rgb.b);
+    return luminance > 0.45 ? '#1a202c' : '#ffffff';
+}
+
 // Sequential Palette
 const sequentialPalettes = [
     ['#f7fbff', '#deebf7', '#c6dbef', '#9ecae1', '#6baed6', '#4292c6', '#2171b5'],
@@ -148,11 +155,28 @@ function testColors() {
     // Display preview
     const previewChart = document.getElementById('preview-chart');
     previewChart.innerHTML = '';
+    const sampleData = [92, 68, 75, 54, 100, 81, 63];
+    const maxValue = Math.max(...sampleData);
+
     colors.forEach((color, i) => {
-        const div = document.createElement('div');
-        div.style.backgroundColor = color;
-        div.textContent = i + 1;
-        previewChart.appendChild(div);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'preview-bar-wrap';
+
+        const value = sampleData[i % sampleData.length];
+        const bar = document.createElement('div');
+        bar.className = 'preview-bar';
+        bar.style.backgroundColor = color;
+        bar.style.height = `${Math.max(8, (value / maxValue) * 100)}%`;
+        bar.style.color = getReadableTextColor(color);
+        bar.textContent = value;
+
+        const label = document.createElement('span');
+        label.className = 'preview-label';
+        label.textContent = `Color ${i + 1}`;
+
+        wrapper.appendChild(bar);
+        wrapper.appendChild(label);
+        previewChart.appendChild(wrapper);
     });
 
     // Analyze colors
@@ -168,7 +192,11 @@ function analyzeColorPalette(colors) {
         distinctiveness: [],
         minContrast: Infinity,
         avgLightness: 0,
-        warnings: []
+        lightnessRange: 0,
+        hueCoverage: 0,
+        suggestedUse: 'Exploratory',
+        warnings: [],
+        recommendations: []
     };
 
     // Calculate contrast between adjacent colors
@@ -190,6 +218,9 @@ function analyzeColorPalette(colors) {
         return hsl.l;
     });
     analysis.avgLightness = lightnesses.reduce((a, b) => a + b, 0) / lightnesses.length;
+    const maxLightness = Math.max(...lightnesses);
+    const minLightness = Math.min(...lightnesses);
+    analysis.lightnessRange = maxLightness - minLightness;
 
     // Generate warnings
     if (analysis.minContrast < 2) {
@@ -218,12 +249,63 @@ function analyzeColorPalette(colors) {
         analysis.warnings.push('Some colors have very similar hues - may be confusing');
     }
 
+    // Hue coverage across the palette
+    if (hues.length > 1) {
+        const sortedHues = [...hues].sort((a, b) => a - b);
+        const gaps = sortedHues.map((hue, index) => {
+            const nextHue = sortedHues[(index + 1) % sortedHues.length];
+            let diff = nextHue - hue;
+            if (index === sortedHues.length - 1) {
+                diff = (360 - hue) + sortedHues[0];
+            }
+            if (diff < 0) diff += 360;
+            return diff;
+        });
+        const maxGap = Math.max(...gaps);
+        analysis.hueCoverage = 360 - maxGap;
+    }
+
+    const tolerance = 4;
+    const isAscending = lightnesses.every((value, i, arr) => i === 0 || value >= arr[i - 1] - tolerance);
+    const isDescending = lightnesses.every((value, i, arr) => i === 0 || value <= arr[i - 1] + tolerance);
+    const edgeDifference = Math.abs(lightnesses[0] - lightnesses[lightnesses.length - 1]);
+
+    if (isAscending || isDescending) {
+        analysis.suggestedUse = 'Sequential data (ordered values)';
+    } else if (analysis.lightnessRange > 35 && edgeDifference < 12) {
+        analysis.suggestedUse = 'Diverging data (values around a midpoint)';
+    } else {
+        analysis.suggestedUse = 'Categorical comparison (unordered categories)';
+    }
+
+    if (analysis.lightnessRange < 25) {
+        analysis.recommendations.push('Increase the lightness spread so that small details remain visible.');
+    }
+    if (analysis.hueCoverage < 120) {
+        analysis.recommendations.push('Introduce hues farther apart on the wheel to avoid monochromatic visuals.');
+    }
+    if (analysis.minContrast < 3) {
+        analysis.recommendations.push('Boost contrast between adjacent colors to prevent blending.');
+    }
+    if (analysis.recommendations.length === 0 && analysis.warnings.length === 0) {
+        analysis.recommendations.push('Palette is balanced—ready for production charts.');
+    }
+
     return analysis;
 }
 
 function displayAnalysis(analysis) {
     const container = document.getElementById('analysis-results');
-    let html = '<div class="analysis-item"><strong>Color Distinctiveness (Contrast Ratios):</strong><br>';
+    let html = `<div class="analysis-item"><strong>Suggested Palette Use:</strong> ${analysis.suggestedUse}</div>`;
+
+    html += `<div class="analysis-item"><strong>Average Lightness:</strong> ${analysis.avgLightness.toFixed(1)}%
+        <span class="analysis-meta">Range: ${analysis.lightnessRange.toFixed(1)}%</span></div>`;
+
+    if (analysis.hueCoverage) {
+        html += `<div class="analysis-item"><strong>Hue Coverage:</strong> ${analysis.hueCoverage.toFixed(1)}° around the wheel</div>`;
+    }
+
+    html += '<div class="analysis-item"><strong>Color Distinctiveness (Contrast Ratios):</strong><br>';
 
     analysis.distinctiveness.forEach(item => {
         const quality = item.ratio < 2 ? 'Poor' : item.ratio < 3 ? 'Fair' : 'Good';
@@ -231,16 +313,20 @@ function displayAnalysis(analysis) {
     });
     html += '</div>';
 
-    html += `<div class="analysis-item"><strong>Average Lightness:</strong> ${analysis.avgLightness.toFixed(1)}%</div>`;
-
     if (analysis.warnings.length > 0) {
         html += '<div class="analysis-item"><strong>Warnings:</strong><br>';
         analysis.warnings.forEach(warning => {
             html += `⚠️ ${warning}<br>`;
         });
         html += '</div>';
-    } else {
-        html += '<div class="analysis-item"><strong>Status:</strong> ✅ No major issues detected</div>';
+    }
+
+    if (analysis.recommendations.length > 0) {
+        html += '<div class="analysis-item"><strong>Suggestions:</strong><ul class="analysis-list">';
+        analysis.recommendations.forEach(text => {
+            html += `<li>${text}</li>`;
+        });
+        html += '</ul></div>';
     }
 
     container.innerHTML = html;
