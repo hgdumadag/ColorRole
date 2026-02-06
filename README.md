@@ -1,85 +1,58 @@
-# Color Visualization Explorer
+# Exam Builder & Practice
 
-An interactive web application to explore and understand color theory principles for effective data visualization.
+A reusable, interactive web application for building exams and supporting both practice and assessment modes.
 
 ## Features
 
-### 1. Color Palette Types
-- **Sequential Palettes**: For ordered data (low to high values)
-- **Diverging Palettes**: For data with a meaningful midpoint
-- **Categorical Palettes**: For distinct, unordered categories
-- Randomize button to explore different palette options
+### 1. Reusable Exam Schema
+- Centralized `exam.json` defines metadata, instructions, and questions.
+- Supports question types:
+  - Multiple choice
+  - True/False
+  - Short text
+  - Long text
 
-### 2. Good vs Bad Color Combinations
-Visual examples demonstrating:
-- What makes color combinations effective
-- Common mistakes to avoid
-- Best practices for data visualization
+### 2. Dual Modes
+- **Practice mode**: Provides coaching hints without revealing answers.
+- **Assessment mode**: Reveals correct answers with rationale after grading.
 
-### 3. Interactive Color Tester
-- Select up to 5 custom colors
-- See real-time visualization preview
-- Get automated analysis including:
-  - Color distinctiveness (contrast ratios)
-  - Average lightness
-  - Warnings for potential issues
+### 3. LLM-Ready Text Grading
+- Text responses are sent to a configurable grading endpoint.
+- Works with OpenAI (e.g., `gpt-5.2-mini`) or local LLMs via Ollama.
+- Payload includes a consistent structure: exam, question, rubric, and student response.
 
-### 4. Color Blindness Simulation
-Test your color palettes for accessibility with simulations of:
-- Protanopia (Red-Blind)
-- Deuteranopia (Green-Blind)
-- Tritanopia (Blue-Blind)
-- Achromatopsia (Total Color Blindness)
-
-### 5. Contrast Checker
-- Test foreground and background color combinations
-- Verify WCAG AA and AAA compliance
-- See real-time contrast ratio calculations
-- Ensure accessibility standards are met
-
-### 6. Color Harmony Generator
-Generate harmonious color combinations based on:
-- Complementary colors
-- Analogous colors
-- Triadic colors
-- Split complementary
-- Tetradic (square)
-
-### 7. Best Practices Summary
-Quick reference guide of dos and don'ts for data visualization color usage
+### 4. Results Dashboard
+- Tracks question completion.
+- Summarizes feedback and scoring.
 
 ## Usage
 
-Simply open `index.html` in a web browser. No server or installation required!
+1. Open `index.html` in a browser (no build tools required).
+2. Edit `exam.json` to create new subjects or exams.
+3. Add a grading endpoint for short/long text answers.
+
+## Text Grading Endpoint (Expected Payload)
+
+```json
+{
+  "mode": "practice",
+  "exam": {"id": "math-101-midterm", "title": "Math 101 Midterm", "subject": "Algebra Basics"},
+  "question": {
+    "id": "q3",
+    "type": "short_text",
+    "prompt": "Solve for x: 4x + 6 = 18",
+    "rubric": "Award 2 points for x=3 with correct steps...",
+    "commonMistakes": ["Subtracting 6 incorrectly", "Dividing by 4 before isolating"]
+  },
+  "answer": "x = 3"
+}
+```
 
 ## Technologies Used
 
 - HTML5
-- CSS3 (with Grid and Flexbox)
-- Vanilla JavaScript (no dependencies)
-
-## Key Concepts Demonstrated
-
-- **Perceptual Uniformity**: Sequential palettes that change uniformly in perceived lightness
-- **Accessibility**: Color blindness simulation and WCAG contrast compliance
-- **Color Theory**: Harmony rules based on the color wheel
-- **Data Visualization Best Practices**: Appropriate color usage for different data types
-
-## Color Accessibility Guidelines
-
-- Minimum contrast ratio of 4.5:1 for normal text (WCAG AA)
-- Minimum contrast ratio of 3:1 for large text (WCAG AA)
-- Avoid relying on red-green distinctions alone
-- Test palettes with color blindness simulations
-- Limit categorical palettes to 5-7 distinct colors
-
-## Browser Compatibility
-
-Works in all modern browsers that support:
-- CSS Grid
-- CSS Custom Properties
-- HTML5 Color Input
-- ES6 JavaScript
+- CSS3
+- Vanilla JavaScript
 
 ## License
 

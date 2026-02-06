@@ -1,0 +1,68 @@
+{
+  "exam": {
+    "id": "math-101-midterm",
+    "title": "Math 101 Midterm",
+    "subject": "Algebra Basics",
+    "timeLimitMinutes": 60,
+    "instructions": [
+      "Answer all questions.",
+      "Practice mode provides coaching hints without revealing answers.",
+      "Assessment mode provides the correct answer and rationale."
+    ]
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "prompt": "Which expression is equivalent to 3(x + 4)?",
+      "options": [
+        "3x + 4",
+        "3x + 12",
+        "x + 12",
+        "3x + 7"
+      ],
+      "answer_key": {
+        "correct": [1],
+        "rationale": "Use the distributive property: 3(x + 4) = 3x + 12."
+      }
+    },
+    {
+      "id": "q2",
+      "type": "true_false",
+      "prompt": "The solution to 2x = 10 is x = 5.",
+      "options": ["True", "False"],
+      "answer_key": {
+        "correct": [0],
+        "rationale": "Divide both sides by 2 to get x = 5."
+      }
+    },
+    {
+      "id": "q3",
+      "type": "short_text",
+      "prompt": "Solve for x: 4x + 6 = 18",
+      "grading": {
+        "maxScore": 2,
+        "rubric": "Award 2 points for x=3 with correct steps, 1 point for correct value without steps, 0 otherwise.",
+        "commonMistakes": [
+          "Subtracting 6 incorrectly",
+          "Dividing by 4 before isolating",
+          "Arithmetic errors when dividing 12 by 4"
+        ]
+      }
+    },
+    {
+      "id": "q4",
+      "type": "long_text",
+      "prompt": "Explain how to solve 2(x - 5) = 6 and identify a common mistake.",
+      "grading": {
+        "maxScore": 4,
+        "rubric": "Explain distribution, isolation, and final answer x=8. Mention at least one common mistake.",
+        "commonMistakes": [
+          "Forgetting to distribute the 2",
+          "Adding 5 instead of subtracting",
+          "Incorrectly dividing 6 by 2"
+        ]
+      }
+    }
+  ]
+}
